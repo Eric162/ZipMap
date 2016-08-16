@@ -1,0 +1,29 @@
+{
+  "name": "petermap",
+  "version": "1.0.0",
+  "description": "lefleat app sample",
+  "main": "app.js",
+  "dependencies": {
+    "ejs": "^2.5.1",
+    "express": "^4.14.0",
+    "mongoose": "^4.5.9",
+    "mongoose-geojson-schema": "^2.1.2",
+    "node-sass": "^3.8.0",
+    "nodemon": "^1.10.0",
+    "sass": "^0.5.0"
+  },
+  "devDependencies": {
+    "grunt": "^1.0.1",
+    "grunt-contrib-watch": "^1.0.0",
+    "grunt-sass": "^1.2.1",
+    "node-sass": "^3.8.0",
+    "nodemon": "^1.10.0"
+  },
+  "scripts": {
+    "build-css": "node-sass --include-path scss sass/main.scss public/css/main.css",
+    "watch-css": "nodemon -e scss -x \"npm run build-css\"",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "shilrey_eric@bah.com",
+  "license": "MIT"
+}
