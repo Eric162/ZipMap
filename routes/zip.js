@@ -6,15 +6,8 @@ var ZipCode = require('../models/zipcodeModel');
 
 router.get('/:zipcode', function(req, res) {
   var zipReq = req.params.zipcode;
-  console.log("zip requested: " + zipReq);
-    // ZipCode.findOne({'properties.ZCTA5CE10':zipReq}, function(err, zipData) {
-    //   console.log(zipData);
-    //   if (error) utils.sendErrResponse(res, 500, "An error occurred retreiving zip");
-    //   else utils.sendSuccessResponse(res, {zipData:zipData});
-    // });
     ZipCode.findOne({'properties.ZCTA5CE10':zipReq})
       .exec(function(error, zipData) {
-        // console.log(zipData);
         if (error) utils.sendErrResponse(res, 500, "An error occurred retreiving zip");
         else utils.sendSuccessResponse(res, {zipData:zipData});
     });

@@ -15,40 +15,10 @@ db.once('open', function (callback) {
 // Import route handlers
 var zipcodes = require('./routes/zip');
 
-
 // Import Zip model
 var ZipCode = require('./models/zipcodeModel');
 
 var app = express();
-
-// Create a schema
-// var ZipSchema = new mongoose.Schema({
-//   type: String,
-//   properties: {
-//     ZCTA5CE10: String,
-//     GEOID10: String,
-//     CLASSFP10: String,
-//     MTFCC10: String,
-//     FUNCSTAT10: String,
-//     ALAND10: Number,
-//     AWATER10: Number,
-//     INTPTLAT10: String,
-//     INTPTLON10: String
-//   },
-//   geometry: mongoose.Schema.Types.Geometry
-// });
-//
-// var ZipCode = mongoose.model('zips', ZipSchema);
-
-
-// DB test
-// ZipCode.findOne({'properties.ZCTA5CE10':'53405'}, function (err, zipcode) {
-//   if (err) return console.error(err);
-//   console.log(zipcode);
-// });
-// ZipCode.find({}).count();
-
-
 
 // views as directory for all template files
 app.set('views', path.join(__dirname, 'views'));
@@ -63,7 +33,6 @@ app.get('/', function(req, res) {
   res.render('map_view');
 });
 
-
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   var err = new Error('Not Found');
@@ -71,11 +40,6 @@ app.use(function(req, res, next) {
   res.redirect('/');
 //  next(err);
 });
-
-
-
-
-
 
 // Set server port
 app.listen(3000);

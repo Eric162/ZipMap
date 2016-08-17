@@ -1,21 +1,14 @@
 var app = angular.module('zips', ['leaflet-directive']);
 app.controller("GeoJSONController", ['$scope', '$http', 'leafletData', function($scope, $http, leafletData) {
 
-    var getStyle = function(feature) {
-        return {
-            fillColor: 'red',
-            weight: 2,
-            opacity: 1,
-            color: 'white',
-            dashArray: '3',
-            fillOpacity: 0.7
-        };
-    };
+    var geoJsonLayer = L.geoJson();
 
     var createGeoJsonObject = function(data) {
         return {
-            data: data,
-            style: getStyle
+            data: {
+                type: "FeatureCollection",
+                features: [data]
+            }
         };
     };
 
@@ -32,40 +25,53 @@ app.controller("GeoJSONController", ['$scope', '$http', 'leafletData', function(
     $scope.centerJSON = function(index) {
         leafletData.getMap().then(function(map) {
             var latlngs = [];
-            for (var i in $scope.geojson.data.geometry.coordinates) {
-                var coord = $scope.geojson.data.geometry.coordinates[i];
-                // console.log(coord);
-                for (var j in coord) {
-                    var points = coord[j];
-                    console.log(points);
-                    latlngs.push(L.GeoJSON.coordsToLatLng(points));
+            var type = $scope.geojson.data.features[0].geometry.type;
+            if (type === "MultiPolygon") {
+                for (var array in $scope.geojson.data.features[0].geometry.coordinates) {
+                    var coords = $scope.geojson.data.features[0].geometry.coordinates[array];
+                    for (var i in coords) {
+                        var coord = coords[i];
+                        for (var j in coord) {
+                            var points = coord[j];
+                            latlngs.push(L.GeoJSON.coordsToLatLng(points));
+                        }
+                    }
                 }
+            } else if (type === "Polygon") {
+                for (var i in $scope.geojson.data.features[0].geometry.coordinates) {
+                    var coord = $scope.geojson.data.features[0].geometry.coordinates[i];
+                    // console.log(coord);
+                    for (var j in coord) {
+                        var points = coord[j];
+                        // console.log(points);
+                        latlngs.push(L.GeoJSON.coordsToLatLng(points));
+                    }
+                }
+            } else {
+                // TODO tell user bounds could not be drawn
+                return;
             }
+
             map.fitBounds(latlngs);
+            geoJsonLayer = L.geoJson($scope.geojson.data.features[0]).addTo(map);
         });
     };
 
     $scope.getZipData = function(zipString) {
         if (zipString.length !== 5) return;
-        console.log("getting zip data");
-
-        $http({
-            method: 'GET',
-            url: '/zip/' + zipString
-        }).success(function(data) {
+        $http.get('/zip/' + zipString).success(function(data) {
             var zipData = data.content.zipData;
             if (zipData === null) return;
-
-            console.log(zipData);
             $scope.geojson = createGeoJsonObject(zipData);
-            console.log("Data in model ($scope.geojson): ");
-            console.log($scope.geojson);
+            geoJsonLayer.clearLayers();
 
             $scope.centerJSON();
         })
     };
 
-
+    $scope.submit = function() {
+        $scope.getZipData($scope.zip);
+    }
 
 }]);
 
@@ -90,61 +96,33 @@ app.directive('numbersOnly', function() {
     };
 });
 
+function getSelectedText() {
+    var text = "";
+    if (typeof window.getSelection != "undefined") {
+        text = window.getSelection().toString();
+    } else if (typeof document.selection != "undefined" && document.selection.type == "Text") {
+        text = document.selection.createRange().text;
+    }
+    return text;
+}
+
 app.directive("limitTo", [function() {
     return {
         restrict: "A",
         link: function(scope, elem, attrs) {
             var limit = parseInt(attrs.limitTo);
+            var inputField = angular.element(elem);
             angular.element(elem).on("keypress", function(e) {
-                if (this.value.length == limit) e.preventDefault();
+                if (e.keyCode == 13) {
+                    angular.element(elem).parent().submit;
+                } else if (this.value.length == limit) {
+                    var selected = getSelectedText();
+                    if (selected.length > 0) {
+                      return;
+                    }
+                    e.preventDefault();
+                }
             });
         }
     }
 }]);
-
-// $(document).ready(function() {
-//
-//   // $('input').keypress(function (e) {
-//   //   if (e.which == 13) {
-//   //     $('#zipForm').submit();
-//   //   }
-//   // });
-//   //
-//   // $('#zipForm').on('submit', function(event) {
-//   //   console.log('Submitting..........');
-//   //   var zipString = $("input:first").val();
-//   //   if (zipString.length !== 5) {
-//   //     console.log("Bad zip string");
-//   //     return;
-//   //   }
-//   //
-//   //   console.log("Valid input, getting zip data for: " + zipString);
-//   //   $.get(
-//   //      '/zip/' + zipString
-//   //    ).done(function(response){
-//   //      var zipData = response.content.zipData;
-//   //      console.log(response);
-//   //      console.log(zipData);
-//   //    });
-//   //
-//   // });
-//
-//   // var zipInput = $('#zip');
-//   // $(document).on('submit', '#zipForm', function(evt) {
-//   //   console.log("Submitting........");
-//   //   evt.preventDefault();
-//   //   zipString = zipInput.value;
-//   //   console.log("length " + zipString);
-//   //   if (zipString.length !== 5) return;
-//   //   $.get(
-//   //     '/zip/' + zipString
-//   //   ).done(function(response){
-//   //     var zipData = response.content.zipData;
-//   //     console.log(response);
-//   //     console.log(zipData);
-//   //     //TODO
-//   //   }).fail()
-//   //
-//   // });
-//
-// });
