@@ -1,5 +1,5 @@
 {
-  "name": "petermap",
+  "name": "zipmap",
   "version": "1.0.0",
   "description": "lefleat app sample",
   "main": "app.js",
