@@ -118,7 +118,7 @@ app.directive("limitTo", [function() {
                 } else if (this.value.length == limit) {
                     var selected = getSelectedText();
                     if (selected.length > 0) {
-                      return;
+                        return;
                     }
                     e.preventDefault();
                 }

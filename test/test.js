@@ -3,6 +3,7 @@ Mocha tests for the app.
  */
 var assert = require('assert');
 var webdriver = require('selenium-webdriver');
+var helpers = require('../public/js/helpers.js');
 
 var driver = new webdriver.Builder().
 withCapabilities(webdriver.Capabilities.chrome()).
@@ -108,3 +109,20 @@ describe('ZipMap', function() {
     });
 
 });
+
+describe('helpers.js', function() {
+    describe('.createGeoJsonObject', function() {
+        it('should return an object in the correct format', function() {
+            var testData = {
+                "stuff": 1
+            }
+            var data = {
+                data: {
+                    type: "FeatureCollection",
+                    features: [testData]
+                }
+            }
+            assert.deepEqual(helpers.createGeoJsonObject(testData), data);
+        })
+    })
+})
