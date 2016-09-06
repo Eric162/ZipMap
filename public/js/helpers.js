@@ -2,7 +2,7 @@ function createGeoJsonObject(data) {
     return {
         data: {
             type: "FeatureCollection",
-            features: data
+            features: [data]
         }
     };
 };
